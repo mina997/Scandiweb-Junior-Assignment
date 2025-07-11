@@ -47,7 +47,7 @@ Before you begin, ensure you have the following software installed on your syste
    - Clone the repository:
 
    ```bash
-   git clone https://github.com/AbdelhamidYousef/Scandiweb-Junior-Assignment-2.git
+   git clone https://github.com/mina997/Scandiweb-Junior-Assignment.git
    ```
 
    - Navigate to the project directory:
