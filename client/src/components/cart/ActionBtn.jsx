@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 class ActionBtn extends Component {
   render() {
-    const { text, onClick, data = '', type = 'button' } = this.props;
+    const { text, onClick, data = 'cart-btn', type = 'button' } = this.props;
 
     return (
       <button
