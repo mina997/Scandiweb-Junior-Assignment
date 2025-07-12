@@ -53,7 +53,7 @@ Before you begin, ensure you have the following software installed on your syste
    - Navigate to the project directory:
 
    ```bash
-   cd Scandiweb-Junior-Assignment-2
+   cd Scandiweb-Junior-Assignment
    ```
 
 2. **Run the Backend:**
