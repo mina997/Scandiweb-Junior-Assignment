@@ -17,12 +17,12 @@ function NavigationMenu({ categories, handleCategoryChange }) {
                 // to={`/?category=${category}`}
                 to={`/${category}`}
                 className={`block pb-4 border-b-2 ${
-                  isActive
+                  isٍselected
                     ? 'nav-active'
                     : 'border-transparent hover:text-primary'
                 }`}
                 data-testid={
-                  isActive ? 'active-category-link' : 'category-link'
+                  isSelected ? 'active-category-link' : 'category-link'
                 }
                 onClick={() => handleCategoryChange(category)}
               >
