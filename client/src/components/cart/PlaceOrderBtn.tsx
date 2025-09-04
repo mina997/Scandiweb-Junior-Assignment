@@ -1,16 +1,64 @@
-import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
 import { useMutation } from '@apollo/client';
 import { PLACE_ORDER } from '../../graphql/mutations';
 import { Spinner } from '../';
 import { useDataContext } from '../../DataContext';
 
-function PlaceOrderBtn({ className }) {
+interface Price {
+  currency: {
+    symbol: string;
+  };
+  amount: number;
+}
+
+interface AttributeItem {
+  id: string;
+  attribute_id: string;
+  value: string;
+  displayValue: string;
+}
+
+interface AttributeSet {
+  id: string;
+  name: string;
+  type: string;
+  items: AttributeItem[];
+}
+
+interface Product {
+  id: string;
+  name: string;
+  inStock: boolean;
+  gallery: string[];
+  prices: Price[];
+  attributes: AttributeSet[];
+  description: string;
+  quantity?: number;
+}
+
+interface SelectedAttribute {
+    id: string;
+    attributeId: string;
+    value: string;
+}
+
+interface CartItem {
+  id: string;
+  product: Product;
+  selectedAttributes: SelectedAttribute[];
+  quantity: number;
+}
+
+interface PlaceOrderBtnProps {
+  className?: string;
+}
+
+function PlaceOrderBtn({ className }: PlaceOrderBtnProps) {
   const [placeOrder, { loading }] = useMutation(PLACE_ORDER);
   const { emptyCart } = useDataContext();
 
   const handlePlaceOrder = async () => {
-    const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+    const cartItems: CartItem[] = JSON.parse(localStorage.getItem('cartItems') || '[]');
 
     if (!cartItems.length) {
       return toast.error('Cart is empty! 🛒');
@@ -35,8 +83,8 @@ function PlaceOrderBtn({ className }) {
       });
 
       emptyCart();
-      toast.success(data.placeOrder);
-    } catch (err) {
+      toast.success(data.placeOrder || 'Order placed successfully!');
+    } catch (err: any) {
       if (err.graphQLErrors && err.graphQLErrors.length > 0) {
         const errorMessage = err.graphQLErrors[0].message;
         return toast.error(`Error placing order: ${errorMessage}`);
@@ -70,9 +118,5 @@ function PlaceOrderBtn({ className }) {
     </button>
   );
 }
-
-PlaceOrderBtn.propTypes = {
-  className: PropTypes.string,
-};
 
 export default PlaceOrderBtn;

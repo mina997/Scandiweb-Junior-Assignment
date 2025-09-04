@@ -1,12 +1,16 @@
-import PropTypes from 'prop-types';
 import CartModalItem from './CartModalItem';
 import PlaceOrderBtn from './PlaceOrderBtn';
+import { CartItem } from '../../types'; // Import CartItem
 
-function CartModal({ cartItems = [] }) {
+interface CartModalProps {
+  cartItems?: CartItem[];
+}
+
+function CartModal({ cartItems = [] }: CartModalProps) {
   const totalPrice = cartItems
     .reduce(
       (total, item) =>
-        total + parseFloat(item.product?.prices[0]?.amount) * item.quantity,
+        total + (parseFloat(item.product.prices[0]?.amount || '0') || 0) * item.quantity,
       0
     )
     .toFixed(2);
@@ -37,7 +41,7 @@ function CartModal({ cartItems = [] }) {
             <div className="flex items-center justify-between">
               <h3 className="font-semibold font-roboto">Total</h3>
               <div className="font-bold" data-testid="cart-total">
-                {`${cartItems[0]?.product.prices[0].currency.symbol} ${totalPrice}`}
+                {`${cartItems[0]?.product?.prices[0]?.currency?.symbol || ''} ${totalPrice}`}
               </div>
             </div>
 
@@ -48,9 +52,5 @@ function CartModal({ cartItems = [] }) {
     </section>
   );
 }
-
-CartModal.propTypes = {
-  cartItems: PropTypes.arrayOf(PropTypes.object),
-};
 
 export default CartModal;

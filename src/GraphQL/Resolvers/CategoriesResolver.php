@@ -8,6 +8,7 @@ class CategoriesResolver
 {
     public static function index(): array
     {
-        return Category::all();
+        $categories = Category::all();
+        return array_map(fn ($category) => $category->toArray(), $categories);
     }
 }

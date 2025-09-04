@@ -8,42 +8,37 @@ class Order extends Model
 {
     protected static string $table = 'orders';
 
-    public static function create(Database $db): array
+    public function __construct(?array $data = [])
     {
-        $result = $db->query(
-            'INSERT INTO ' . static::$table . ' (total_amount, total_currency) VALUES (?, ?)',
-            [0, 'USD']
-        );
-
-        if (!$result) {
-            return [
-                'success' => false,
-                'error' => 'Failed to create order'
-            ];
-        }
-
-        return [
-            'success' => true,
-            'orderId' => $db->getLastInsertId()
-        ];
+        parent::__construct($data);
+        $this->data['items'] = [];
     }
 
-    public static function update(Database $db, int $orderId, float $totalAmount, string $currency): array
+    public function addItem(OrderItem $item): void
     {
-        $result = $db->query(
-            'UPDATE ' . static::$table . ' SET total_amount = ?, total_currency = ? WHERE id = ?',
-            [$totalAmount, $currency, $orderId]
-        );
+        $this->data['items'][] = $item;
+    }
 
-        if (!$result) {
-            return [
-                'success' => false,
-                'error' => 'Failed to update order'
-            ];
+    public function save(Database $db): void
+    {
+        if (isset($this->id)) {
+            // Update existing order
+            $db->query(
+                'UPDATE ' . static::$table . ' SET total_amount = ?, total_currency = ? WHERE id = ?',
+                [$this->total_amount, $this->total_currency, $this->id]
+            );
+        } else {
+            // Create new order
+            $db->query(
+                'INSERT INTO ' . static::$table . ' (total_amount, total_currency) VALUES (?, ?)',
+                [$this->total_amount, $this->total_currency]
+            );
+            $this->id = $db->getLastInsertId();
         }
 
-        return [
-            'success' => true
-        ];
+        foreach ($this->items as $item) {
+            $item->order_id = $this->id;
+            $item->save($db);
+        }
     }
 }

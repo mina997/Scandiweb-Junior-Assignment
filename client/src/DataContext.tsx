@@ -1,33 +1,52 @@
-import PropTypes from 'prop-types';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState, ReactNode } from 'react';
 import { toast } from 'react-toastify';
+import { Product, CartItem, SelectedAttribute } from './types';
 
-const DataContext = createContext();
+// Define the shape of the context data
+interface DataContextType {
+  productsData: Product[];
+  setProductsData: React.Dispatch<React.SetStateAction<Product[]>>;
+  selectedCategory: string | null;
+  setSelectedCategory: React.Dispatch<React.SetStateAction<string | null>>;
+  addToCart: (product: Product, shouldProvideAttributes?: boolean, selectedAttributes?: SelectedAttribute[]) => void;
+  cartItems: CartItem[];
+  updateCartItemQuantity: (itemId: string, value: number) => void;
+  updateCartItemAttribute: (product: Product, oldAttributes: SelectedAttribute[], newAttributes: SelectedAttribute[]) => void;
+  emptyCart: () => void;
+  cartModelShow: boolean;
+  setCartModelShow: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-export const DataProvider = ({ children }) => {
-  const [productsData, setProductsData] = useState([]);
-  const [cartItems, setCartItems] = useState(
-    JSON.parse(localStorage.getItem('cartItems')) || []
+const DataContext = createContext<DataContextType | undefined>(undefined);
+
+interface DataProviderProps {
+  children: ReactNode;
+}
+
+export const DataProvider = ({ children }: DataProviderProps) => {
+  const [productsData, setProductsData] = useState<Product[]>([]);
+  const [cartItems, setCartItems] = useState<CartItem[]>(
+    JSON.parse(localStorage.getItem('cartItems') || '[]')
   );
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [cartModelShow, setCartModelShow] = useState(false);
 
   const addToCart = (
-    product = {},
+    product: Product,
     shouldProvideAttributes = false,
-    selectedAttributes = []
+    selectedAttributes: SelectedAttribute[] = []
   ) => {
     let attributes;
 
     if (shouldProvideAttributes) {
-      const missingAttributes = product.attributes.filter(
+      const missingAttributes = product.attributes?.filter(
         (attr) =>
           !selectedAttributes.some(
             (selectedAttr) => selectedAttr.attributeId === attr.name
           )
       );
 
-      if (missingAttributes.length > 0) {
+      if (missingAttributes && missingAttributes.length > 0) {
         return toast.error('Please select all attributes! ⚠️');
       }
 
@@ -57,7 +76,7 @@ export const DataProvider = ({ children }) => {
       existingCartItems[existingItemIndex].quantity += 1;
     } else {
       const newItem = {
-        id: new Date().valueOf(),
+        id: new Date().valueOf().toString(),
         product,
         selectedAttributes: attributes,
         quantity: 1,
@@ -68,12 +87,14 @@ export const DataProvider = ({ children }) => {
 
     setCartItems(existingCartItems);
     localStorage.setItem('cartItems', JSON.stringify(existingCartItems));
-    setCartModelShow(true); // Open cart modal when item is added
+    setTimeout(() => {
+      setCartModelShow(true); // Open cart modal when item is added
+    }, 0);
 
     toast.success('Item added to cart! 🛒');
   };
 
-  const updateCartItemAttribute = (product, oldAttributes, newAttributes) => {
+  const updateCartItemAttribute = (product: Product, oldAttributes: SelectedAttribute[], newAttributes: SelectedAttribute[]) => {
     const itemIndex = cartItems.findIndex(
       (item) =>
         item.product.id === product.id &&
@@ -94,7 +115,7 @@ export const DataProvider = ({ children }) => {
     // update the cart item if no duplicate item is found with the same attributes
     if (duplicateItemIndex === -1) {
       const updatedCartItem = {
-        ...cartItems[itemIndex],
+        ...cartItems[itemIndex]!,
         selectedAttributes: newAttributes,
       };
 
@@ -118,11 +139,11 @@ export const DataProvider = ({ children }) => {
     localStorage.setItem('cartItems', JSON.stringify(existingCartItems));
   };
 
-  const updateCartItemQuantity = (itemId, value) => {
+  const updateCartItemQuantity = (itemId: string, value: number) => {
     const existingCartItems =
-      JSON.parse(localStorage.getItem('cartItems')) || [];
+      JSON.parse(localStorage.getItem('cartItems') || '[]');
 
-    const index = existingCartItems.findIndex((item) => item.id === itemId);
+    const index = existingCartItems.findIndex((item: CartItem) => item.id === itemId);
 
     if (index !== -1) {
       existingCartItems[index].quantity += value;
@@ -165,8 +186,10 @@ export const DataProvider = ({ children }) => {
   );
 };
 
-export const useDataContext = () => useContext(DataContext);
-
-DataProvider.propTypes = {
-  children: PropTypes.node.isRequired,
+export const useDataContext = () => {
+  const context = useContext(DataContext);
+  if (context === undefined) {
+    throw new Error('useDataContext must be used within a DataProvider');
+  }
+  return context;
 };

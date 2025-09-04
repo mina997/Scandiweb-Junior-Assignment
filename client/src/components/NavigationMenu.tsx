@@ -1,8 +1,12 @@
-import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { useDataContext } from '../DataContext';
 
-function NavigationMenu({ categories, handleCategoryChange }) {
+interface NavigationMenuProps {
+  categories: string[];
+  handleCategoryChange: (category: string) => void;
+}
+
+function NavigationMenu({ categories, handleCategoryChange }: NavigationMenuProps) {
   const { selectedCategory } = useDataContext();
 
   return (
@@ -17,7 +21,7 @@ function NavigationMenu({ categories, handleCategoryChange }) {
                 // to={`/?category=${category}`}
                 to={`/${category}`}
                 className={`block pb-4 border-b-2 ${
-                  isٍselected
+                  isSelected
                     ? 'nav-active'
                     : 'border-transparent hover:text-primary'
                 }`}
@@ -35,10 +39,5 @@ function NavigationMenu({ categories, handleCategoryChange }) {
     </nav>
   );
 }
-
-NavigationMenu.propTypes = {
-  categories: PropTypes.array,
-  handleCategoryChange: PropTypes.func,
-};
 
 export default NavigationMenu;

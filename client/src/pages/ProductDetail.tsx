@@ -19,7 +19,7 @@ function ProductDetail() {
   if (error) {
     return error.networkError ? (
       <Error
-        statusCode={error.networkError.statusCode}
+        statusCode={(error.networkError as any)?.statusCode ?? 500}
         message="Product not found"
       />
     ) : (

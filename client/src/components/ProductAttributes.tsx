@@ -1,28 +1,35 @@
-import { useState } from 'react';
-import PropTypes from 'prop-types';
+import { useState, FC } from 'react';
 import DOMPurify from 'dompurify';
 import parse from 'html-react-parser';
 import { useDataContext } from '../DataContext';
+import { Product, Price, AttributeItem, AttributeSet, SelectedAttribute } from '../types';
 
-const ProductAttributes = ({
+interface ProductAttributesProps {
+  product: Product;
+  className?: string;
+  isModalView?: boolean;
+  itemSelectedAttributes?: SelectedAttribute[];
+}
+
+const ProductAttributes: FC<ProductAttributesProps> = ({
   product,
   className,
   isModalView = false,
   itemSelectedAttributes = [],
 }) => {
   const { addToCart, updateCartItemAttribute } = useDataContext();
-  const [selectedAttributes, setSelectedAttributes] = useState(
+  const [selectedAttributes, setSelectedAttributes] = useState<SelectedAttribute[]>(
     itemSelectedAttributes
   );
 
   const totalPrice =
     product.prices && product.prices.length > 0
       ? `${product.prices[0].currency.symbol} ${(
-          parseFloat(product.prices[0]?.amount) * (product.quantity ?? 1)
+          parseFloat(product.prices[0].amount) * (product.quantity ?? 1)
         ).toFixed(2)}`
       : null;
 
-  const handleAttributeClick = (attribute) => {
+  const handleAttributeClick = (attribute: AttributeItem) => {
     const existingIndex = selectedAttributes.findIndex(
       (attr) => attr.attributeId === attribute.attribute_id
     );
@@ -54,11 +61,11 @@ const ProductAttributes = ({
     }
   };
 
-  const isAttributeValueSelected = (attribute) => {
+  const isAttributeValueSelected = (attribute: AttributeItem) => {
     return selectedAttributes.some(
       (attr) =>
-        attribute.attribute_id === attr.attributeId &&
-        attribute.value === attr.value
+        attr.attributeId === attribute.attribute_id &&
+        attr.value === attribute.value
     );
   };
 
@@ -108,8 +115,8 @@ const ProductAttributes = ({
                   } transition-colors`}
                   style={{ backgroundColor: attribute.value }}
                   title={attribute.displayValue}
-                  onClick={() => handleAttributeClick(attribute)}
-                  disabled={!product.inStock}
+                  onClick={() => !isModalView && handleAttributeClick(attribute)}
+                  disabled={!product.inStock || isModalView}
                   data-testid={`${
                     isModalView ? 'cart-item' : 'product'
                   }-attribute-${attributeSet.name.replace(/\s+/g, '-')}-${
@@ -139,8 +146,8 @@ const ProductAttributes = ({
                   } px-1 flex items-center justify-center transition-colors border ${
                     product.inStock ? 'hover:bg-gray-800 hover:text-white' : ''
                   } border-gray-800`}
-                  disabled={!product.inStock}
-                  onClick={() => handleAttributeClick(attribute)}
+                  disabled={!product.inStock || isModalView}
+                  onClick={() => !isModalView && handleAttributeClick(attribute)}
                   data-testid={`${
                     isModalView ? 'cart-item' : 'product'
                   }-attribute-${attributeSet.name.replace(
@@ -164,7 +171,7 @@ const ProductAttributes = ({
           <div className="heading-h2">
             {product.prices &&
               product.prices.length > 0 &&
-              `${product.prices[0]?.currency.symbol} ${product.prices[0]?.amount}`}
+              `${product.prices[0].currency.symbol} ${product.prices[0].amount}`}
           </div>
         </>
       )}
@@ -174,7 +181,7 @@ const ProductAttributes = ({
           type="button"
           className="w-full mb-8 btn-cta"
           onClick={() => addToCart(product, true, selectedAttributes)}
-          disabled={product.attributes.length !== selectedAttributes.length}
+          disabled={(product.attributes?.length ?? 0) !== selectedAttributes.length}
           data-testid="add-to-cart"
         >
           Add to Cart
@@ -188,13 +195,6 @@ const ProductAttributes = ({
       )}
     </div>
   );
-};
-
-ProductAttributes.propTypes = {
-  product: PropTypes.object.isRequired,
-  className: PropTypes.string,
-  isModalView: PropTypes.bool,
-  itemSelectedAttributes: PropTypes.array,
 };
 
 export default ProductAttributes;

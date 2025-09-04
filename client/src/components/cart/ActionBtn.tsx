@@ -1,28 +1,21 @@
-import { Component } from 'react';
-import PropTypes from 'prop-types';
-
-class ActionBtn extends Component {
-  render() {
-    const { text, onClick, data = 'cart-btn', type = 'button' } = this.props;
-
-    return (
-      <button
-        type={type}
-        className="flex items-center justify-center w-6 h-6 transition-colors border border-text hover:bg-text hover:text-white"
-        onClick={onClick}
-        data-testid={data}
-      >
-        {text}
-      </button>
-    );
-  }
+interface ActionBtnProps {
+  text: string;
+  type?: 'button' | 'submit' | 'reset';
+  onClick?: () => void;
+  data?: string;
 }
 
-ActionBtn.propTypes = {
-  text: PropTypes.string.isRequired,
-  type: PropTypes.string,
-  onClick: PropTypes.func,
-  data: PropTypes.string,
-};
+function ActionBtn({ text, onClick, data = 'cart-btn', type = 'button' }: ActionBtnProps) {
+  return (
+    <button
+      type={type}
+      className="flex items-center justify-center w-6 h-6 transition-colors border border-text hover:bg-text hover:text-white"
+      onClick={onClick}
+      data-testid={data}
+    >
+      {text}
+    </button>
+  );
+}
 
 export default ActionBtn;

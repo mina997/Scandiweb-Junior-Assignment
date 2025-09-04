@@ -1,9 +1,13 @@
-import PropTypes from 'prop-types';
 import ProductAttributes from '../ProductAttributes';
 import ActionBtn from './ActionBtn';
 import { useDataContext } from '../../DataContext';
+import { CartItem } from '../../types'; // Import CartItem
 
-function CartModalItem({ item = {} }) {
+interface CartModalItemProps {
+  item: CartItem;
+}
+
+function CartModalItem({ item }: CartModalItemProps) {
   const { updateCartItemQuantity } = useDataContext();
 
   const productImage = item.product.gallery?.length
@@ -43,9 +47,5 @@ function CartModalItem({ item = {} }) {
     </div>
   );
 }
-
-CartModalItem.propTypes = {
-  item: PropTypes.object,
-};
 
 export default CartModalItem;

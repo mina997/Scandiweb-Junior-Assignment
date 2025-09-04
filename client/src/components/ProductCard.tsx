@@ -1,10 +1,46 @@
-import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Cart } from './';
 import searchingImg from '../assets/searching.svg';
 import { useDataContext } from '../DataContext';
 
-function ProductCard({ product = {} }) {
+interface Price {
+  amount: string;
+  currency: {
+    label: string;
+    symbol: string;
+  };
+}
+
+interface AttributeItem {
+  id: string;
+  value: string;
+  displayValue: string;
+}
+
+interface AttributeSet {
+  id: string;
+  name: string;
+  type: string;
+  items: AttributeItem[];
+}
+
+interface Product {
+  id: string;
+  name: string;
+  inStock: boolean;
+  gallery: string[];
+  description: string;
+  brand: string;
+  prices: Price[];
+  category: string;
+  attributes: AttributeSet[];
+}
+
+interface ProductCardProps {
+  product: Product;
+}
+
+function ProductCard({ product }: ProductCardProps) {
   const { addToCart } = useDataContext();
 
   return (
@@ -50,40 +86,5 @@ function ProductCard({ product = {} }) {
     </article>
   );
 }
-
-ProductCard.propTypes = {
-  product: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    inStock: PropTypes.bool.isRequired,
-    gallery: PropTypes.arrayOf(PropTypes.string),
-    description: PropTypes.string.isRequired,
-    brand: PropTypes.string.isRequired,
-    prices: PropTypes.arrayOf(
-      PropTypes.shape({
-        amount: PropTypes.string.isRequired,
-        currency: PropTypes.shape({
-          label: PropTypes.string.isRequired,
-          symbol: PropTypes.string.isRequired,
-        }).isRequired,
-      })
-    ).isRequired,
-    category: PropTypes.string.isRequired,
-    attributes: PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.string.isRequired,
-        name: PropTypes.string.isRequired,
-        type: PropTypes.string.isRequired,
-        items: PropTypes.arrayOf(
-          PropTypes.shape({
-            id: PropTypes.string.isRequired,
-            value: PropTypes.string.isRequired,
-            displayValue: PropTypes.string.isRequired,
-          })
-        ).isRequired,
-      })
-    ).isRequired,
-  }).isRequired,
-};
 
 export default ProductCard;

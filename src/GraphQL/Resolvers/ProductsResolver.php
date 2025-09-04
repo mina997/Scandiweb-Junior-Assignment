@@ -8,11 +8,13 @@ class ProductsResolver
 {
     public static function index(?string $category = null): array
     {
-        return Product::all($category);
+        $products = Product::all($category);
+        return array_map(fn ($product) => $product->toArray(), $products);
     }
 
-    public static function show(string $productId): array
+    public static function show(string $productId): ?array
     {
-        return Product::find($productId);
+        $product = Product::find($productId);
+        return $product ? $product->toArray() : null;
     }
 }

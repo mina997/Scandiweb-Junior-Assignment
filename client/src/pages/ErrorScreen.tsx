@@ -1,28 +1,10 @@
-import PropTypes from 'prop-types';
-import { Component } from 'react';
 import { useRouteError } from 'react-router-dom';
 import { Error } from '../components';
 
-function withRouter(Component) {
-  function ComponentWithRouterProp(props) {
-    const error = useRouteError();
+function ErrorScreen() {
+  const error: any = useRouteError();
 
-    return <Component {...props} error={error} />;
-  }
-
-  return ComponentWithRouterProp;
+  return <Error statusCode={error?.status} />;
 }
 
-class ErrorScreen extends Component {
-  render() {
-    const { error } = this.props;
-
-    return <Error statusCode={error?.status} />;
-  }
-}
-
-ErrorScreen.propTypes = {
-  error: PropTypes.object,
-};
-
-export default withRouter(ErrorScreen);
+export default ErrorScreen;
