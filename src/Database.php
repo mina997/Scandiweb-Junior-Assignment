@@ -6,10 +6,11 @@ use PDO;
 
 class Database
 {
+    private static $instance = null;
     private $connection;
     private $statement;
 
-    public function __construct()
+    private function __construct()
     {
         $dbConfig = require base_path('src/config/database.php') ?? [];
         $dsn = 'mysql:' . http_build_query($dbConfig, arg_separator: ';');
@@ -20,8 +21,17 @@ class Database
             ]);
         } catch (\Exception $e) {
             // dd('Connection failed: ' . $e->getMessage());
-            abort(500, 'Database connection failed');
+            abort(500, 'Database connection failed: ' . $e->getMessage());
         }
+    }
+
+    public static function getInstance()
+    {
+        if (self::$instance === null) {
+            self::$instance = new self();
+        }
+
+        return self::$instance;
     }
 
     public function query($query, $params = [])

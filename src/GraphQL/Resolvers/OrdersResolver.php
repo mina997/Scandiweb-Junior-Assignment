@@ -16,7 +16,7 @@ class OrdersResolver
             abort(400, 'Items are required');
         }
 
-        $db = new Database();
+        $db = Database::getInstance();
         $db->beginTransaction();
 
         try {

@@ -13,7 +13,7 @@ abstract class Model
 
     public function __construct(?array $data = [])
     {
-        $this->db = new Database();
+        $this->db = Database::getInstance();
 
         if (!isset(static::$table)) {
             static::$table = strtolower((new ReflectionClass($this))->getShortName()) . 's';
